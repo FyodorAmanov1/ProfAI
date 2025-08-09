@@ -1,11 +1,13 @@
+// tiny sentiment analyzer for short text; returns numeric sentimentScore
 export function analyzeSentiment(text) {
-    // returns a numeric sentimentScore between -1 (very negative) and +1 (very positive)
-    if (!text) return 0
-    const negative = ['frustrat', 'angry', 'hate', 'bad', 'stuck']
-    const positive = ['good', 'nice', 'great', 'yay', 'done']
-    const txt = text.toLowerCase()
-    let score = 0
-    for (const w of negative) if (txt.includes(w)) score -= 0.6
-    for (const w of positive) if (txt.includes(w)) score += 0.6
-    return Math.max(-1, Math.min(1, score))
+    if (!text || typeof text !== "string") return 0;
+    const negative = ["bug", "error", "fail", "wrong", "stuck"];
+    const positive = ["nice", "good", "works", "passed", "yay", "done"];
+    let score = 0;
+    const lower = text.toLowerCase();
+    negative.forEach(w => { if (lower.includes(w)) score -= 1; });
+    positive.forEach(w => { if (lower.includes(w)) score += 1; });
+    // normalize small range
+    return Math.max(-3, Math.min(3, score));
   }
+  

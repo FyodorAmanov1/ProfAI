@@ -1,35 +1,73 @@
-export async function gradeSubmission(submission) {
-    // submission: { lessonId, taskId, code }
-    // We'll do a very simple evaluation: call the user's function named `solve` if present.
-    const results = []
-    const tests = submission.tests || []
-  
+// grade locally: run tests on student's code in a safe JS eval runner for simple JS tasks.
+// Important: this is a simple grader for small exercises; production should call backend sandbox for safety.
+export function gradeLocally(code, task) {
+    // task.tests: [{input: [...], expected: ...}, ...]
+    // returns submission.results: [{ testId, passed, expected, actual, error }]
+    const results = [];
+    // wrap code so that user's function is available as `__user__`
+    const wrapped = `${code}\n//# sourceURL=user-submission.js`;
+    let userFn;
     try {
-      // Create a function from user's code in a safe-ish wrapper.
-      // WARNING: this is unsafe for production — never eval user code on the client in real apps.
-      // For the MVP frontend, this helps simulate test runs.
-      // We expect the user to export a function called `solve` that accepts a single arg.
-      // Example user code:
-      // function solve(name) { return `Hello, ${name}!` }
-  
       // eslint-disable-next-line no-new-func
-      const userFunc = new Function(`${submission.code}; return typeof solve === 'function' ? solve : null`)()
-  
-      for (const t of tests) {
-        try {
-          const output = await Promise.resolve(userFunc(t.input))
-          const pass = output === t.expected
-          results.push({ input: t.input, expected: t.expected, output, pass })
-        } catch (err) {
-          results.push({ input: t.input, expected: t.expected, output: String(err), pass: false, error: true })
-        }
+      const moduleFunc = new Function(`${wrapped}; return typeof add === 'function' ? add : (typeof solution === 'function' ? solution : undefined);`);
+      userFn = moduleFunc();
+      if (typeof userFn !== "function") {
+        throw new Error("No function exported. Ensure you define `function add(...)` or `function solution(...)`.");
       }
     } catch (err) {
-      for (const t of tests) {
-        results.push({ input: t.input, expected: t.expected, output: String(err), pass: false, error: true })
-      }
+      // All tests fail with error message
+      task.tests.forEach((t, idx) => {
+        results.push({
+          testId: idx,
+          passed: false,
+          expected: t.expected,
+          actual: null,
+          error: err.message,
+        });
+      });
+      return results;
     }
   
-    return { results, passed: results.every(r => r.pass) }
+    task.tests.forEach((t, idx) => {
+      try {
+        const actual = userFn(...(t.input || []));
+        const passed = deepEqual(actual, t.expected);
+        results.push({
+          testId: idx,
+          passed,
+          expected: t.expected,
+          actual,
+          error: passed ? null : null,
+        });
+      } catch (err) {
+        results.push({
+          testId: idx,
+          passed: false,
+          expected: t.expected,
+          actual: null,
+          error: err.message,
+        });
+      }
+    });
+    return results;
+  }
+  
+  function deepEqual(a, b) {
+    try {
+      return JSON.stringify(a) === JSON.stringify(b);
+    } catch {
+      return a === b;
+    }
+  }
+  
+  // helper that either runs local grader or defers to server
+  export async function grade(code, task, useServer = false, postSubmission) {
+    if (useServer && typeof postSubmission === "function") {
+      const submission = { code, lessonId: task.lessonId, taskId: task.id };
+      const serverRes = await postSubmission(submission); // backend returns submission.results
+      return serverRes.submission ? serverRes.submission.results : serverRes.submission.results;
+    } else {
+      return gradeLocally(code, task);
+    }
   }
   

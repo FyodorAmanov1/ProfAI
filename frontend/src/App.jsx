@@ -1,35 +1,41 @@
-import React from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
-import LessonList from './components/LessonList'
-import LessonViewer from './components/LessonViewer'
-import Playground from './components/Playground'
-import Quiz from './components/Quiz'
-import TeacherDashboard from './components/TeacherDashboard'
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import LessonList from "./components/LessonList";
+import LessonViewer from "./components/LessonViewer";
+import TeacherDashboard from "./components/TeacherDashboard";
 
 export default function App() {
-  return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto p-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold">ProfAI — Vibe Coding</h1>
-          <nav className="space-x-4">
-            <Link to="/" className="hover:underline">Lessons</Link>
-            <Link to="/playground" className="hover:underline">Playground</Link>
-            <Link to="/quiz" className="hover:underline">Quiz</Link>
-            <Link to="/teacher" className="hover:underline">Teacher</Link>
-          </nav>
-        </div>
-      </header>
+  // top-level user/progress state
+  const [user] = useState({ id: "student-1" }); // in real app, pull from auth
+  const [progress, setProgress] = useState({}); // progress[lessonId] = { completed: N }
 
-      <main className="container mx-auto p-6">
-        <Routes>
-          <Route path="/" element={<LessonList />} />
-          <Route path="/lesson/:id" element={<LessonViewer />} />
-          <Route path="/playground" element={<Playground />} />
-          <Route path="/quiz" element={<Quiz />} />
-          <Route path="/teacher" element={<TeacherDashboard />} />
-        </Routes>
-      </main>
-    </div>
-  )
+  function handleProgressUpdate(lessonId, taskId, submission) {
+    setProgress(prev => {
+      const prevLesson = prev[lessonId] || { completed: 0, tasks: {} };
+      const tasks = { ...prevLesson.tasks, [taskId]: submission.results.every(r => r.passed) };
+      const completed = Object.values(tasks).filter(Boolean).length;
+      return { ...prev, [lessonId]: { completed, tasks } };
+    });
+  }
+
+  return (
+    <BrowserRouter>
+      <div style={{display:"flex", gap:24}}>
+        <nav style={{minWidth:220, padding:12, borderRight:"1px solid #eee"}}>
+          <h1>ProfAI</h1>
+          <ul style={{listStyle:"none", padding:0}}>
+            <li><Link to="/">Lessons</Link></li>
+            <li><Link to="/teacher">Teacher Dashboard</Link></li>
+          </ul>
+        </nav>
+        <main style={{padding:12, flex:1}}>
+          <Routes>
+            <Route path="/" element={<LessonList user={user} progress={progress} />} />
+            <Route path="/lessons/:lessonId" element={<LessonViewer user={user} onProgressUpdate={handleProgressUpdate} />} />
+            <Route path="/teacher" element={<TeacherDashboard />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
 }

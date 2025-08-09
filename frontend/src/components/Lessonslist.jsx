@@ -1,22 +1,38 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import LESSONS from '../data/lessons'
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { LESSONS as LOCAL } from "../data/lessons";
+import { fetchLessons } from "../utils/api";
 
-export default function LessonList() {
+export default function LessonList({ user, progress }) {
+  const [lessons, setLessons] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetchLessons().then(data => {
+      setLessons(data.LESSONS || data || LOCAL);
+      setLoading(false);
+    }).catch(() => {
+      // fallback
+      setLessons(LOCAL);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-4">Lessons</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {LESSONS.map(lesson => (
-          <article key={lesson.id} className="p-4 bg-white rounded shadow-sm">
-            <h3 className="text-lg font-medium">{lesson.title}</h3>
-            <p className="text-sm text-gray-600">{lesson.description}</p>
-            <div className="mt-3">
-              <Link to={`/lesson/${lesson.id}`} className="text-sm font-medium text-indigo-600">Open lesson →</Link>
-            </div>
-          </article>
-        ))}
-      </div>
+      <h2>Lessons</h2>
+      {loading ? <p>Loading...</p> : (
+        <ul>
+          {lessons.map(lesson => (
+            <li key={lesson.id} style={{marginBottom:12}}>
+              <Link to={`/lessons/${lesson.id}`}><strong>{lesson.title}</strong></Link>
+              <div style={{fontSize:12}}>{lesson.description}</div>
+              <div style={{fontSize:12, color:"#666"}}>
+                Progress: {(progress && progress[lesson.id]) ? `${progress[lesson.id].completed || 0}/${lesson.tasks.length}` : `0/${lesson.tasks.length}`}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
-  )
+  );
 }
