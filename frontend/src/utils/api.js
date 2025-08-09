@@ -1,5 +1,5 @@
 // small fetch wrapper; keeps frontend/backed compatibility
-const API_BASE = process.env.REACT_APP_API_BASE || ""; // e.g. '', or http://localhost:4000
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000"; // e.g. '', or http://localhost:5000
 
 async function safeFetch(url, options = {}) {
   const res = await fetch(`${API_BASE}${url}`, {

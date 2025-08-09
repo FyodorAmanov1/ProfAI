@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import LessonList from "./components/LessonList";
 import LessonViewer from "./components/LessonViewer";
 import TeacherDashboard from "./components/TeacherDashboard";
@@ -19,8 +19,7 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <div style={{ 
+    <div style={{ 
         display: "flex", 
         minHeight: "100vh",
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
@@ -107,6 +106,5 @@ export default function App() {
           </Routes>
         </main>
       </div>
-    </BrowserRouter>
   );
 }
