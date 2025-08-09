@@ -1,14 +1,21 @@
 {
-    "name": "profai-frontend",
-    "version": "0.1.0",
-    "private": true,
-    "dependencies": {
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0",
-      "react-router-dom": "^6.13.0"
-    },
-    "scripts": {
-      "start": "vite",
-      "build": "vite build"
-    }
+  "name": "profai-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.13.0"
+  },
+  "scripts": {
+    "start": "vite --port 3000",
+    "dev": "vite --port 3000",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^4.4.0"
   }
+}

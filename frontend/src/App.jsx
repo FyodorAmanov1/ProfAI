@@ -20,15 +20,86 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div style={{display:"flex", gap:24}}>
-        <nav style={{minWidth:220, padding:12, borderRight:"1px solid #eee"}}>
-          <h1>ProfAI</h1>
-          <ul style={{listStyle:"none", padding:0}}>
-            <li><Link to="/">Lessons</Link></li>
-            <li><Link to="/teacher">Teacher Dashboard</Link></li>
+      <div style={{ 
+        display: "flex", 
+        minHeight: "100vh",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+      }}>
+        <nav style={{
+          minWidth: 250, 
+          padding: 24, 
+          borderRight: "1px solid #e2e8f0",
+          backgroundColor: "#f8fafc"
+        }}>
+          <div style={{ marginBottom: 32 }}>
+            <h1 style={{ 
+              margin: 0, 
+              color: "#1a202c", 
+              fontSize: "24px",
+              fontWeight: "700"
+            }}>
+              🧠 ProfAI
+            </h1>
+            <p style={{ 
+              margin: "4px 0 0 0", 
+              color: "#718096", 
+              fontSize: "14px" 
+            }}>
+              Learn Algorithms Interactively
+            </p>
+          </div>
+          
+          <ul style={{ 
+            listStyle: "none", 
+            padding: 0, 
+            margin: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px"
+          }}>
+            <li>
+              <Link 
+                to="/" 
+                style={{ 
+                  textDecoration: "none", 
+                  color: "#4a5568",
+                  display: "block",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  transition: "background-color 0.2s"
+                }}
+                onMouseEnter={e => e.target.style.backgroundColor = "#edf2f7"}
+                onMouseLeave={e => e.target.style.backgroundColor = "transparent"}
+              >
+                📚 Algorithm Lessons
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/teacher" 
+                style={{ 
+                  textDecoration: "none", 
+                  color: "#4a5568",
+                  display: "block",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  transition: "background-color 0.2s"
+                }}
+                onMouseEnter={e => e.target.style.backgroundColor = "#edf2f7"}
+                onMouseLeave={e => e.target.style.backgroundColor = "transparent"}
+              >
+                👨‍🏫 Teacher Dashboard
+              </Link>
+            </li>
           </ul>
         </nav>
-        <main style={{padding:12, flex:1}}>
+        
+        <main style={{ 
+          padding: 32, 
+          flex: 1,
+          backgroundColor: "#ffffff",
+          overflow: "auto"
+        }}>
           <Routes>
             <Route path="/" element={<LessonList user={user} progress={progress} />} />
             <Route path="/lessons/:lessonId" element={<LessonViewer user={user} onProgressUpdate={handleProgressUpdate} />} />
