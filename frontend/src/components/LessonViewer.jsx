@@ -4,6 +4,7 @@ import { LESSONS as LOCAL } from "../data/lessons";
 import { fetchLessons, postSubmission } from "../utils/api";
 import Quiz from "./Quiz";
 import Playground from "./Playground";
+import AIAssistant from "./AIAssistant";
 import { getNextHint } from "../utils/hints";
 
 export default function LessonViewer({ user, onProgressUpdate }) {
@@ -83,6 +84,10 @@ export default function LessonViewer({ user, onProgressUpdate }) {
         }}>
           {lesson.description}
         </p>
+
+        <div style={{ marginTop: '20px' }}>
+          <AIAssistant lessonId={lesson.id} userId={user?.id} />
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>

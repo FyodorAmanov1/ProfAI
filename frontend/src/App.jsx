@@ -3,6 +3,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import LessonList from "./components/LessonList";
 import LessonViewer from "./components/LessonViewer";
 import TeacherDashboard from "./components/TeacherDashboard";
+import PlacementTestPage from "./components/PlacementTestPage";
 
 export default function App() {
   // top-level user/progress state
@@ -90,6 +91,23 @@ export default function App() {
                 👨‍🏫 Teacher Dashboard
               </Link>
             </li>
+            <li>
+              <Link 
+                to="/placement-test" 
+                style={{ 
+                  textDecoration: "none", 
+                  color: "#4a5568",
+                  display: "block",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  transition: "background-color 0.2s"
+                }}
+                onMouseEnter={e => e.target.style.backgroundColor = "#edf2f7"}
+                onMouseLeave={e => e.target.style.backgroundColor = "transparent"}
+              >
+                🎯 Placement Test
+              </Link>
+            </li>
           </ul>
         </nav>
         
@@ -103,6 +121,7 @@ export default function App() {
             <Route path="/" element={<LessonList user={user} progress={progress} />} />
             <Route path="/lessons/:lessonId" element={<LessonViewer user={user} onProgressUpdate={handleProgressUpdate} />} />
             <Route path="/teacher" element={<TeacherDashboard />} />
+            <Route path="/placement-test" element={<PlacementTestPage user={user} />} />
           </Routes>
         </main>
       </div>
