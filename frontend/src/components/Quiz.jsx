@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { grade } from "../utils/grader";
 import { postSubmission } from "../utils/api";
+import AITutor from "./AITutor";
 
 /**
  * Props:
@@ -15,6 +16,7 @@ export default function Quiz({ task, user, onSubmissionSaved, getHint }) {
   const [useServer, setUseServer] = useState(false);
   const [hint, setHint] = useState(null);
   const [running, setRunning] = useState(false);
+  const [showAITutor, setShowAITutor] = useState(true);
 
   function getStarterCode(task) {
     // Provide helpful starter code based on task type
@@ -215,6 +217,20 @@ export default function Quiz({ task, user, onSubmissionSaved, getHint }) {
           <strong style={{ color: '#2b6cb0' }}>💡 Hint:</strong>
           <span style={{ marginLeft: '8px', color: '#2d3748' }}>{hint.text}</span>
         </div>
+      )}
+
+      {showAITutor && (
+        <AITutor 
+          task={task}
+          submissionResults={results}
+          code={code}
+          onHintRequest={() => {
+            if (results && results.some(r => !r.passed)) {
+              const next = getHint ? getHint(results) : null;
+              if (next) setHint(next);
+            }
+          }}
+        />
       )}
     </div>
   );

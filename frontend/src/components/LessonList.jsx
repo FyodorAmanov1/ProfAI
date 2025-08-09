@@ -2,25 +2,56 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { LESSONS as LOCAL } from "../data/lessons";
 import { fetchLessons } from "../utils/api";
+import ProgressTracker from "./ProgressTracker";
+import LearningRecommendations from "./LearningRecommendations";
 
 export default function LessonList({ user, progress }) {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submissions, setSubmissions] = useState([]);
   
   useEffect(() => {
-    fetchLessons().then(data => {
-      setLessons(data.LESSONS || data || LOCAL);
-      setLoading(false);
-    }).catch(() => {
-      // fallback
-      setLessons(LOCAL);
+    Promise.all([
+      fetchLessons().catch(() => ({ LESSONS: LOCAL })),
+      fetch('/submissions').then(r => r.json()).catch(() => ({ submissions: [] }))
+    ]).then(([lessonsData, submissionsData]) => {
+      setLessons(lessonsData.LESSONS || lessonsData || LOCAL);
+      setSubmissions(submissionsData.submissions || submissionsData || []);
       setLoading(false);
     });
   }, []);
 
   return (
     <div>
-      <h2>Algorithm Learning Path</h2>
+      <div style={{ marginBottom: '32px' }}>
+        <h2 style={{ 
+          margin: '0 0 8px 0', 
+          color: '#1a202c',
+          fontSize: '28px',
+          fontWeight: '700'
+        }}>
+          Algorithm Learning Path
+        </h2>
+        <p style={{ 
+          margin: 0, 
+          color: '#4a5568',
+          fontSize: '16px',
+          lineHeight: '1.6'
+        }}>
+          Master computer science fundamentals with our AI-powered interactive lessons
+        </p>
+      </div>
+
+      <div style={{ marginBottom: '32px' }}>
+        <ProgressTracker user={user} progress={progress} lessons={lessons} />
+      </div>
+
+      <LearningRecommendations 
+        user={user} 
+        lessons={lessons} 
+        submissions={submissions.filter(s => s.userId === user?.id)} 
+      />
+
       {loading ? <p>Loading...</p> : (
         <div style={{ display: 'grid', gap: '16px' }}>
           {lessons.map(lesson => {
@@ -96,6 +127,22 @@ export default function LessonList({ user, progress }) {
                       {completed}/{total}
                     </span>
                   </div>
+                </div>
+                
+                {/* Lesson Preview */}
+                <div style={{ 
+                  marginTop: '12px', 
+                  fontSize: '12px', 
+                  color: '#718096' 
+                }}>
+                  <span>Topics: </span>
+                  {lesson.tasks?.slice(0, 3).map((task, idx) => (
+                    <span key={task.id}>
+                      {task.title}
+                      {idx < Math.min(2, lesson.tasks.length - 1) ? ', ' : ''}
+                    </span>
+                  ))}
+                  {lesson.tasks?.length > 3 && <span>...</span>}
                 </div>
               </div>
             );
